@@ -32,7 +32,12 @@ CREATE TABLE photos (
 	creation_time bigint,
 	x_coordinate double precision,
 	y_coordinate double precision,
-	z_coordinate double precision
+	z_coordinate double precision,
+	animal_name text,
+	animal_class text,
+	avg_weight double precision,
+	vegetarian boolean,
+	habitat text
 );
 
 CREATE TABLE tags (
