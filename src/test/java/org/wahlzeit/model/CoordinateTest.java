@@ -1,8 +1,6 @@
 package org.wahlzeit.model;
 import org.junit.Test;
 
-import java.time.LocalDate;
-
 import static org.junit.Assert.*;
 
 public class CoordinateTest {
@@ -41,6 +39,20 @@ public class CoordinateTest {
         assertFalse(notEqual);
         assertFalse(wrongClass);
         assertFalse(nullPointer);
+    }
+
+    @Test
+    public void testHashCode() {
+        Coordinate coordinate1 = new Coordinate(1,2,3);
+        Coordinate coordinate2 = new Coordinate(3,2,1);
+        Coordinate coordinate3 = new Coordinate(3,2,1);
+
+        int hash1 = coordinate1.hashCode();
+        int hash2 = coordinate2.hashCode();
+        int hash3 = coordinate3.hashCode();
+
+        assertEquals(hash2, hash3);
+        assertNotEquals(hash1, hash2);
     }
 
 }
