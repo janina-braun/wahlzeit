@@ -35,7 +35,11 @@ public class PhotoManager extends ObjectManager {
 	/**
 	 * 
 	 */
-	public static PhotoManager getInstance() {
+	public static synchronized PhotoManager getInstance() {
+		if (instance == null) {
+			SysLog.logSysInfo("setting generic PhotoManager");
+			setInstance(new PhotoManager());
+		}
 		return instance;
 	}
 
