@@ -20,13 +20,13 @@ public class AnimalTest {
 
     @Test
     public void testEquals() {
-        Coordinate coordinate = new Coordinate(1,2,3);
+        Coordinate cCoordinate = new CartesianCoordinate(1,2,3);
         Animal animal1 = new Animal("elephant", "mammal", 4000.0, true, "forest");
         Animal animal2 = new Animal("crocodile", "reptile", 200.0, true, "water");
         Animal animal3 = new Animal("crocodile", "reptile", 200.0, true, "water");
         Boolean notEqual = animal1.equals(animal2);
         Boolean equal = animal2.equals(animal3);
-        Boolean wrongClass = animal1.equals(coordinate);
+        Boolean wrongClass = animal1.equals(cCoordinate);
         Boolean nullPointer = animal1.equals(null);
 
         assertTrue(equal);

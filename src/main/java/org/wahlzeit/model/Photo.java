@@ -154,6 +154,18 @@ public class Photo extends DataObject {
 
 		if (location != null) {
 			location.readFrom(rset);
+		} else {
+			if (rset.getInt("coordinate_type") == 0) { //type cartesian
+				double x = (rset.getDouble("coordinate1"));
+				double y = (rset.getDouble("coordinate2"));
+				double z = (rset.getDouble("coordinate3"));
+				location = new Location(new CartesianCoordinate(x, y, z));
+			} else {
+				double phi = (rset.getDouble("coordinate1"));
+				double theta = (rset.getDouble("coordinate2"));
+				double radius = (rset.getDouble("coordinate3"));
+				location = new Location(new SphericCoordinate(phi, theta, radius));
+			}
 		}
 	}
 	
