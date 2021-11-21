@@ -7,21 +7,19 @@ import java.sql.SQLException;
 
 public class AnimalPhotoFactory extends PhotoFactory{
 
-    private static AnimalPhotoFactory instance = null;
+    private static boolean isInitialized = false;
 
     public static synchronized AnimalPhotoFactory getInstance() {
-        if (instance == null) {
-            SysLog.logSysInfo("setting generic AnimalPhotoFactory");
-            setInstance(new AnimalPhotoFactory());
+        if (!isInitialized) {
+            SysLog.logSysInfo("setting specialized AnimalPhotoFactory");
+            PhotoFactory.setInstance(new AnimalPhotoFactory());
+            isInitialized = true;
         }
-        return instance;
+        return (AnimalPhotoFactory) PhotoFactory.getInstance();
     }
 
-    protected static synchronized void setInstance(AnimalPhotoFactory animalPhotoFactory) {
-        if (instance != null) {
-            throw new IllegalStateException("attempt to initialize PhotoFactory twice");
-        }
-        instance = animalPhotoFactory;
+    protected AnimalPhotoFactory() {
+        //do nothing
     }
 
     @Override
