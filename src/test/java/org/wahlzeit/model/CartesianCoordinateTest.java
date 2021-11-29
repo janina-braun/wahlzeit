@@ -2,15 +2,17 @@ package org.wahlzeit.model;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.Cookie;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
 public class CartesianCoordinateTest {
     final double tolerance = 0.000001;
+    CartesianCoordinate coordinate0 = null;
     CartesianCoordinate coordinate1 = null;
     CartesianCoordinate coordinate2 = null;
     CartesianCoordinate coordinate3 = null;
+    SphericCoordinate s_coordinate0 = null;
     SphericCoordinate s_coordinate1 = null;
     SphericCoordinate s_coordinate2 = null;
     SphericCoordinate s_coordinate3 = null;
@@ -18,9 +20,11 @@ public class CartesianCoordinateTest {
 
     @Before
     public void setUp() {
+        coordinate0 = new CartesianCoordinate(0,0,0);
         coordinate1 = new CartesianCoordinate(1,2,3);
         coordinate2 = new CartesianCoordinate(3,2,1);
         coordinate3 = new CartesianCoordinate(3,2,1);
+        s_coordinate0 = new SphericCoordinate(0,0,0);
         s_coordinate1 = new SphericCoordinate(1.10714871779409, 0.640522312679425,  3.74165738677394); //equals coordinate1
         s_coordinate2 = new SphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate2
         s_coordinate3 = new SphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate3
@@ -41,10 +45,21 @@ public class CartesianCoordinateTest {
         assertEquals(Math.sqrt(8), distance2, tolerance); //cartesian and spheric
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testGetCartesianDistanceNullPointer() {
+        coordinate1.getCartesianDistance(null);
+    }
+
     @Test
     public void testAsSphericCoordinate() {
         SphericCoordinate s = coordinate2.asSphericCoordinate();
         assertEquals(s_coordinate2, s); //cartesian to spheric
+    }
+
+    @Test
+    public void testOriginAsSphericCoordinate() {
+        SphericCoordinate s = coordinate0.asSphericCoordinate();
+        assertEquals(s_coordinate0, s); //cartesian to spheric
     }
 
     @Test
@@ -54,6 +69,11 @@ public class CartesianCoordinateTest {
         double expect = Math.acos(Math.sin(1.10714871779409)*Math.sin(0.588002603547568) + Math.cos(1.10714871779409)*Math.cos(0.588002603547568)*Math.cos(Math.abs(1.30024656381632-0.640522312679425)));
         assertEquals(expect, angle1, tolerance); //cartesian and spheric
         assertEquals(expect, angle2, tolerance); //cartesian and cartesian
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetCentralAngleNullPointer() {
+        coordinate1.getCentralAngle(null);
     }
 
     @Test
@@ -67,6 +87,11 @@ public class CartesianCoordinateTest {
         assertFalse(isNotEqual1); //cartesian and cartesian
         assertTrue(isEqual2); //cartesian and spheric
         assertFalse(isNotEqual2); //cartesian and spheric
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testIsEqualNullPointer() {
+        coordinate1.isEqual(null);
     }
 
     @Test
@@ -94,5 +119,14 @@ public class CartesianCoordinateTest {
 
         assertEquals(hash2, hash3);
         assertNotEquals(hash1, hash2);
+    }
+
+    @Test
+    public void testDoWriteOn() {
+        ArrayList<Number> values = coordinate1.doWriteOn();
+        assertEquals(0, values.get(0));
+        assertEquals(coordinate1.getX(), values.get(1));
+        assertEquals(coordinate1.getY(), values.get(2));
+        assertEquals(coordinate1.getZ(), values.get(3));
     }
 }
