@@ -18,6 +18,15 @@ public class CartesianCoordinate extends AbstractCoordinate {
         return this;
     }
 
+    @Override
+    public double getCartesianDistance(Coordinate coordinate) {
+        CartesianCoordinate c = coordinate.asCartesianCoordinate();
+        double d_x = Math.pow(x - c.getX(), 2); //(x1 - x2)^2
+        double d_y = Math.pow(y - c.getY(), 2); //(y1 - y2)^2
+        double d_z = Math.pow(z - c.getZ(), 2); //(z1 - z2)^2
+        return Math.sqrt(d_x + d_y + d_z);
+    }
+
     public SphericCoordinate asSphericCoordinate() throws ArithmeticException {
         double radius = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         //if radius=0, theta and phi must be 0 too
@@ -28,6 +37,17 @@ public class CartesianCoordinate extends AbstractCoordinate {
         double theta = Math.acos(z / radius);
         double phi = Math.atan2(y, x);
         return new SphericCoordinate(phi, theta, radius);
+    }
+
+    @Override
+    public boolean isEqual(Coordinate coordinate) {
+        CartesianCoordinate c = coordinate.asCartesianCoordinate();
+        if (Math.abs(x - c.getX()) <= tolerance) {
+            if (Math.abs(y - c.getY()) <= tolerance) {
+                return Math.abs(z - c.getZ()) <= tolerance;
+            }
+        }
+        return false;
     }
 
     @Override

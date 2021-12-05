@@ -13,35 +13,18 @@ public abstract class AbstractCoordinate extends DataObject implements Coordinat
     public abstract CartesianCoordinate asCartesianCoordinate();
 
     public double getCartesianDistance(Coordinate coordinate) {
-        CartesianCoordinate c1 = this.asCartesianCoordinate();
-        CartesianCoordinate c2 = coordinate.asCartesianCoordinate();
-        double d_x = Math.pow(c1.getX() - c2.getX(), 2); //(x1 - x2)^2
-        double d_y = Math.pow(c1.getY() - c2.getY(), 2); //(y1 - y2)^2
-        double d_z = Math.pow(c1.getZ() - c2.getZ(), 2); //(z1 - z2)^2
-        return Math.sqrt(d_x + d_y + d_z);
+        return this.asCartesianCoordinate().getCartesianDistance(coordinate);
     }
 
     public abstract SphericCoordinate asSphericCoordinate();
 
     public double getCentralAngle(Coordinate coordinate) {
-        SphericCoordinate s1 = this.asSphericCoordinate();
-        SphericCoordinate s2 = coordinate.asSphericCoordinate();
-        double part1 = Math.sin(s1.getPhi()) * Math.sin(s2.getPhi());
-        double deltaTheta = Math.abs(s2.getTheta() - s1.getTheta());
-        double part2 = Math.cos(s1.getPhi()) * Math.cos(s2.getPhi()) * Math.cos(deltaTheta);
-        return Math.acos(part1 + part2);
+        return this.asSphericCoordinate().getCentralAngle(coordinate);
     }
 
     @Override
     public boolean isEqual(Coordinate coordinate) {
-        CartesianCoordinate c1 = this.asCartesianCoordinate();
-        CartesianCoordinate c2 = coordinate.asCartesianCoordinate();
-        if (Math.abs(c1.getX() - c2.getX()) <= tolerance) {
-            if (Math.abs(c1.getY() - c2.getY()) <= tolerance) {
-                return Math.abs(c1.getZ() - c2.getZ()) <= tolerance;
-            }
-        }
-        return false;
+        return this.asCartesianCoordinate().isEqual(coordinate);
     }
 
     @Override
@@ -49,6 +32,11 @@ public abstract class AbstractCoordinate extends DataObject implements Coordinat
         if (this == o) return true;
         if (!(o instanceof Coordinate)) return false;
         return this.isEqual((Coordinate) o);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.asCartesianCoordinate().hashCode();
     }
 
     public void readFrom(ResultSet rset) throws SQLException {

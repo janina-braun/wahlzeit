@@ -1,7 +1,6 @@
 package org.wahlzeit.model;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class SphericCoordinate extends AbstractCoordinate {
     private double phi;
@@ -37,19 +36,23 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(phi, theta, radius);
+    public double getCentralAngle(Coordinate coordinate) {
+        SphericCoordinate s = coordinate.asSphericCoordinate();
+        double part1 = Math.sin(phi) * Math.sin(s.getPhi());
+        double deltaTheta = Math.abs(s.getTheta() - theta);
+        double part2 = Math.cos(phi) * Math.cos(s.getPhi()) * Math.cos(deltaTheta);
+        return Math.acos(part1 + part2);
     }
 
     //get coordinate type and the values of the three coordinates to write them into the variables of the subclass
     public void doReadFrom(int type, double c1, double c2, double c3) {
         if (type == 0) { //type cartesian
-            //Coordinates of the ResultSet are of type catesian and have to be converted before saving
+            //Coordinates of the ResultSet are of type cartesian and have to be converted before saving
             SphericCoordinate s = new CartesianCoordinate(c1, c2, c3).asSphericCoordinate();
             setPhi(s.getPhi());
             setTheta(s.getTheta());
             setRadius(s.getRadius());
-        } else { //type spheric
+        } else { //type spheric 
             //Coordinates of the ResultSet are of type spheric
             setPhi(c1);
             setTheta(c2);
