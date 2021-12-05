@@ -2,17 +2,19 @@ package org.wahlzeit.model;
 
 import java.util.ArrayList;
 
+import static org.wahlzeit.model.AssertUtils.*;
+
 public class SphericCoordinate extends AbstractCoordinate {
     private double phi;
     private double theta;
     private double radius;
 
     public SphericCoordinate(double phi, double theta, double radius) throws IllegalArgumentException{
-        if (radius < 0) {
-            //negative radius is a illegal argument
-            //radius must be >= 0.0
-            throw new IllegalArgumentException("Radius cannot be negative.");
-        } else if (radius <= tolerance) {
+        assertValidDouble(phi);
+        assertValidDouble(theta);
+        assertValidDouble(radius);
+        assertNotNegative(radius);
+        if (radius <= tolerance) {
             //if radius = 0.0, theta and phi are also 0.0
             this.phi = 0.0;
             this.theta = 0.0;
@@ -22,13 +24,18 @@ public class SphericCoordinate extends AbstractCoordinate {
             this.theta = theta;
             this.radius = radius;
         }
+        assertClassInvariants();
     }
 
     public CartesianCoordinate asCartesianCoordinate() throws ArithmeticException {
+        assertClassInvariants();
         double x = radius * Math.cos(phi) * Math.sin(theta);
         double y = radius * Math.sin(phi) * Math.sin(theta);
         double z = radius * Math.cos(theta);
-        return new CartesianCoordinate(x, y, z);
+        CartesianCoordinate cartesian = new CartesianCoordinate(x, y, z);
+        //CartesianCoordinate Constructor executes assertClassInvariants for cartesian
+        assertClassInvariants();
+        return cartesian;
     }
 
     public SphericCoordinate asSphericCoordinate() {
@@ -37,11 +44,17 @@ public class SphericCoordinate extends AbstractCoordinate {
 
     @Override
     public double getCentralAngle(Coordinate coordinate) {
+        assertArgumentNotNull(coordinate);
+        assertClassInvariants();
         SphericCoordinate s = coordinate.asSphericCoordinate();
         double part1 = Math.sin(phi) * Math.sin(s.getPhi());
         double deltaTheta = Math.abs(s.getTheta() - theta);
         double part2 = Math.cos(phi) * Math.cos(s.getPhi()) * Math.cos(deltaTheta);
-        return Math.acos(part1 + part2);
+        double centralAngle = Math.acos(part1 + part2);
+        assertValidDouble(centralAngle);
+        assertAngle(centralAngle);
+        assertClassInvariants();
+        return centralAngle;
     }
 
     //get coordinate type and the values of the three coordinates to write them into the variables of the subclass
@@ -49,14 +62,17 @@ public class SphericCoordinate extends AbstractCoordinate {
         if (type == 0) { //type cartesian
             //Coordinates of the ResultSet are of type cartesian and have to be converted before saving
             SphericCoordinate s = new CartesianCoordinate(c1, c2, c3).asSphericCoordinate();
+            //SphericCoordinate Constructor in asSphericCoordinate executes assertClassInvariants for s
             setPhi(s.getPhi());
             setTheta(s.getTheta());
             setRadius(s.getRadius());
-        } else { //type spheric 
+            //setter execute assertValidDouble
+        } else { //type spheric
             //Coordinates of the ResultSet are of type spheric
             setPhi(c1);
             setTheta(c2);
             setRadius(c3);
+            //setter execute assertValidDouble
         }
     }
 
@@ -75,6 +91,7 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setPhi(double phi) {
+        assertValidDouble(phi);
         this.phi = phi;
     }
 
@@ -83,6 +100,7 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setTheta(double theta) {
+        assertValidDouble(theta);
         this.theta = theta;
     }
 
@@ -91,6 +109,22 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setRadius(double radius) {
+        assertValidDouble(radius);
+        assertNotNegative(radius);
         this.radius = radius;
+    }
+
+    @Override
+    protected void assertClassInvariants() {
+        assertValidDouble(phi);
+        assertValidDouble(theta);
+        assertValidDouble(radius);
+        assertNotNegative(radius);
+    }
+
+    protected static void assertAngle(double angle) {
+        if (angle < 0 || angle > 360) {
+            throw new ArithmeticException("Angle can only be between 0 and 360 degrees.");
+        }
     }
 }

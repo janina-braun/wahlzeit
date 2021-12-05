@@ -34,7 +34,7 @@ public class SphericCoordinateTest {
     }
 
     //Throws an IllegalArgumentException if radius <= 0.0
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void testRadiusIsNegative() {
         //negative radius is a illegal argument
         //radius must be >= 0.0
@@ -68,7 +68,7 @@ public class SphericCoordinateTest {
         assertEquals(Math.sqrt(8), distance2, tolerance); //spheric and spheric
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetCartesianDistanceNullPointer() {
         s_coordinate1.getCartesianDistance(null);
     }
@@ -88,7 +88,7 @@ public class SphericCoordinateTest {
         assertEquals(expect, angle2, tolerance); //spheric and cartesian
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetCentralAngleNullPointer() {
         s_coordinate1.getCentralAngle(null);
     }
@@ -106,7 +106,7 @@ public class SphericCoordinateTest {
         assertFalse(isNotEqual2); //spheric and spheric
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsEqualNullPointer() {
         s_coordinate1.isEqual(null);
     }

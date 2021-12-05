@@ -45,7 +45,7 @@ public class CartesianCoordinateTest {
         assertEquals(Math.sqrt(8), distance2, tolerance); //cartesian and spheric
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetCartesianDistanceNullPointer() {
         coordinate1.getCartesianDistance(null);
     }
@@ -71,7 +71,7 @@ public class CartesianCoordinateTest {
         assertEquals(expect, angle2, tolerance); //cartesian and cartesian
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetCentralAngleNullPointer() {
         coordinate1.getCentralAngle(null);
     }
@@ -89,7 +89,7 @@ public class CartesianCoordinateTest {
         assertFalse(isNotEqual2); //cartesian and spheric
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsEqualNullPointer() {
         coordinate1.isEqual(null);
     }

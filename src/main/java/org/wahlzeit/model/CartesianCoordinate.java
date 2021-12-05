@@ -3,15 +3,21 @@ package org.wahlzeit.model;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static org.wahlzeit.model.AssertUtils.*;
+
 public class CartesianCoordinate extends AbstractCoordinate {
     private double x;
     private double y;
     private double z;
 
     public CartesianCoordinate(double x, double y, double z) {
+        assertValidDouble(x);
+        assertValidDouble(y);
+        assertValidDouble(z);
         setX(x);
         setY(y);
         setZ(z);
+        assertClassInvariants();
     }
 
     public CartesianCoordinate asCartesianCoordinate() {
@@ -20,14 +26,21 @@ public class CartesianCoordinate extends AbstractCoordinate {
 
     @Override
     public double getCartesianDistance(Coordinate coordinate) {
+        assertArgumentNotNull(coordinate);
+        assertClassInvariants();
         CartesianCoordinate c = coordinate.asCartesianCoordinate();
         double d_x = Math.pow(x - c.getX(), 2); //(x1 - x2)^2
         double d_y = Math.pow(y - c.getY(), 2); //(y1 - y2)^2
         double d_z = Math.pow(z - c.getZ(), 2); //(z1 - z2)^2
-        return Math.sqrt(d_x + d_y + d_z);
+        double distance = Math.sqrt(d_x + d_y + d_z);
+        assertValidDouble(distance);
+        assertNotNegative(distance);
+        assertClassInvariants();
+        return distance;
     }
 
     public SphericCoordinate asSphericCoordinate() throws ArithmeticException {
+        assertClassInvariants();
         double radius = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         //if radius=0, theta and phi must be 0 too
         //prevents division by zero
@@ -36,18 +49,25 @@ public class CartesianCoordinate extends AbstractCoordinate {
         }
         double theta = Math.acos(z / radius);
         double phi = Math.atan2(y, x);
-        return new SphericCoordinate(phi, theta, radius);
+        SphericCoordinate spheric = new SphericCoordinate(phi, theta, radius);
+        //SphericCoordinate Constructor executes assertClassInvariants for spheric
+        assertClassInvariants();
+        return spheric;
     }
 
     @Override
     public boolean isEqual(Coordinate coordinate) {
+        assertArgumentNotNull(coordinate);
+        assertClassInvariants();
         CartesianCoordinate c = coordinate.asCartesianCoordinate();
+        boolean equal = false;
         if (Math.abs(x - c.getX()) <= tolerance) {
             if (Math.abs(y - c.getY()) <= tolerance) {
-                return Math.abs(z - c.getZ()) <= tolerance;
+                equal = Math.abs(z - c.getZ()) <= tolerance;
             }
         }
-        return false;
+        assertClassInvariants();
+        return equal;
     }
 
     @Override
@@ -62,12 +82,15 @@ public class CartesianCoordinate extends AbstractCoordinate {
             setX(c1);
             setY(c2);
             setZ(c3);
+            //setter execute assertValidDouble
         } else { //type spheric
             //Coordinates of the ResultSet are of type spheric and have to be converted before saving
             CartesianCoordinate c = new SphericCoordinate(c1, c2, c3).asCartesianCoordinate();
+            //CartesianCoordinate Constructor in asCartesianCoordinate executes assertClassInvariants for c
             setX(c.getX());
             setY(c.getY());
             setZ(c.getZ());
+            //setter execute assertValidDouble
         }
     }
 
@@ -86,6 +109,7 @@ public class CartesianCoordinate extends AbstractCoordinate {
     }
 
     public void setX(double x) {
+        assertValidDouble(x);
         this.x = x;
     }
 
@@ -94,6 +118,7 @@ public class CartesianCoordinate extends AbstractCoordinate {
     }
 
     public void setY(double y) {
+        assertValidDouble(y);
         this.y = y;
     }
 
@@ -102,6 +127,14 @@ public class CartesianCoordinate extends AbstractCoordinate {
     }
 
     public void setZ(double z) {
+        assertValidDouble(z);
         this.z = z;
+    }
+
+    @Override
+    protected void assertClassInvariants() {
+        assertValidDouble(x);
+        assertValidDouble(y);
+        assertValidDouble(z);
     }
 }
