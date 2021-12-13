@@ -33,12 +33,12 @@ public class SphericCoordinateTest {
         location = new Location(coordinate1);
     }
 
-    //Throws an IllegalArgumentException if radius <= 0.0
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testRadiusIsNegative() {
         //negative radius is a illegal argument
         //radius must be >= 0.0
-        new SphericCoordinate(1, 1, -1);
+        SphericCoordinate s = new SphericCoordinate(1, 1, -1);
+        assertEquals(s_coordinate0, s);
     }
 
     @Test
@@ -49,27 +49,27 @@ public class SphericCoordinateTest {
     }
 
     @Test
-    public void testAsCartesianCoordinate() {
+    public void testAsCartesianCoordinate() throws WrongCalculationException {
         CartesianCoordinate c = s_coordinate1.asCartesianCoordinate();
         assertEquals(coordinate1, c); //spheric to cartesian
     }
 
     @Test
-    public void testOriginAsSphericCoordinate() {
+    public void testOriginAsSphericCoordinate() throws WrongCalculationException {
         CartesianCoordinate c = s_coordinate0.asCartesianCoordinate();
         assertEquals(coordinate0, c); //spheric to cartesian
     }
 
     @Test
-    public void testGetCartesianDistance() {
+    public void testGetCartesianDistance() throws WrongCalculationException {
         double distance1 = s_coordinate1.getCartesianDistance(coordinate2);
         double distance2 = s_coordinate1.getCartesianDistance(s_coordinate2);
         assertEquals(Math.sqrt(8), distance1, tolerance); //spheric and cartesian
         assertEquals(Math.sqrt(8), distance2, tolerance); //spheric and spheric
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetCartesianDistanceNullPointer() {
+    @Test(expected = WrongCalculationException.class)
+    public void testGetCartesianDistanceNullPointer() throws WrongCalculationException {
         s_coordinate1.getCartesianDistance(null);
     }
 
@@ -80,7 +80,7 @@ public class SphericCoordinateTest {
     }
 
     @Test
-    public void testGetCentralAngle() {
+    public void testGetCentralAngle() throws WrongCalculationException {
         double angle1 = s_coordinate1.getCentralAngle(s_coordinate2);
         double angle2 = s_coordinate1.getCentralAngle(coordinate2);
         double expect = Math.acos(Math.sin(1.10714871779409)*Math.sin(0.588002603547568) + Math.cos(1.10714871779409)*Math.cos(0.588002603547568)*Math.cos(Math.abs(1.30024656381632-0.640522312679425)));
@@ -88,13 +88,13 @@ public class SphericCoordinateTest {
         assertEquals(expect, angle2, tolerance); //spheric and cartesian
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetCentralAngleNullPointer() {
+    @Test(expected = WrongCalculationException.class)
+    public void testGetCentralAngleNullPointer() throws WrongCalculationException {
         s_coordinate1.getCentralAngle(null);
     }
 
     @Test
-    public void testIsEqual() {
+    public void testIsEqual() throws WrongCalculationException {
         Boolean isNotEqual1 = s_coordinate1.isEqual(coordinate2);
         Boolean isEqual1 = s_coordinate2.isEqual(coordinate3);
         Boolean isNotEqual2 = s_coordinate1.isEqual(s_coordinate2);
@@ -106,9 +106,10 @@ public class SphericCoordinateTest {
         assertFalse(isNotEqual2); //spheric and spheric
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testIsEqualNullPointer() {
-        s_coordinate1.isEqual(null);
+    @Test
+    public void testIsEqualNullPointer() throws WrongCalculationException {
+        Boolean isNotEqual = s_coordinate1.isEqual(null);
+        assertFalse(isNotEqual);
     }
 
     @Test

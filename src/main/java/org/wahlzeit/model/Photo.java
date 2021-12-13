@@ -11,6 +11,8 @@ import java.net.*;
 import org.wahlzeit.services.*;
 import org.wahlzeit.utils.*;
 
+import static org.wahlzeit.model.AssertUtils.assertArgumentNotNull;
+
 /**
  * A photo represents a user-provided (uploaded) photo.
  */
@@ -104,9 +106,16 @@ public class Photo extends DataObject {
 	 * @methodtype constructor
 	 */
 	public Photo(PhotoId myId) {
-		id = myId;
-		
-		incWriteCount();
+		try {
+			assertArgumentNotNull(myId);
+			id = myId;
+			incWriteCount();
+		} catch (IllegalArgumentException e) {
+			final StringBuffer s = new StringBuffer("PhotoId is NullPointer. Fall back to default constructor.");
+			SysLog.log(s);
+			id = PhotoId.getNextId();
+			incWriteCount();
+		}
 	}
 	
 	/**
@@ -114,7 +123,15 @@ public class Photo extends DataObject {
 	 * @methodtype constructor
 	 */
 	public Photo(ResultSet rset) throws SQLException {
-		readFrom(rset);
+		try {
+			assertArgumentNotNull(rset);
+			readFrom(rset);
+		} catch (IllegalArgumentException e) {
+			final StringBuffer s = new StringBuffer("ResultSet is NullPointer. Fall back to default constructor.");
+			SysLog.log(s);
+			id = PhotoId.getNextId();
+			incWriteCount();
+		}
 	}
 
 	/**
@@ -129,43 +146,49 @@ public class Photo extends DataObject {
 	 * 
 	 */
 	public void readFrom(ResultSet rset) throws SQLException {
-		id = PhotoId.getIdFromInt(rset.getInt("id"));
+		try {
+			assertArgumentNotNull(rset);
+			id = PhotoId.getIdFromInt(rset.getInt("id"));
 
-		ownerId = rset.getInt("owner_id");
-		ownerName = rset.getString("owner_name");
-		
-		ownerNotifyAboutPraise = rset.getBoolean("owner_notify_about_praise");
-		ownerEmailAddress = EmailAddress.getFromString(rset.getString("owner_email_address"));
-		ownerLanguage = Language.getFromInt(rset.getInt("owner_language"));
-		ownerHomePage = StringUtil.asUrl(rset.getString("owner_home_page"));
+			ownerId = rset.getInt("owner_id");
+			ownerName = rset.getString("owner_name");
 
-		width = rset.getInt("width");
-		height = rset.getInt("height");
+			ownerNotifyAboutPraise = rset.getBoolean("owner_notify_about_praise");
+			ownerEmailAddress = EmailAddress.getFromString(rset.getString("owner_email_address"));
+			ownerLanguage = Language.getFromInt(rset.getInt("owner_language"));
+			ownerHomePage = StringUtil.asUrl(rset.getString("owner_home_page"));
 
-		tags = new Tags(rset.getString("tags"));
+			width = rset.getInt("width");
+			height = rset.getInt("height");
 
-		status = PhotoStatus.getFromInt(rset.getInt("status"));
-		praiseSum = rset.getInt("praise_sum");
-		noVotes = rset.getInt("no_votes");
+			tags = new Tags(rset.getString("tags"));
 
-		creationTime = rset.getLong("creation_time");
+			status = PhotoStatus.getFromInt(rset.getInt("status"));
+			praiseSum = rset.getInt("praise_sum");
+			noVotes = rset.getInt("no_votes");
 
-		maxPhotoSize = PhotoSize.getFromWidthHeight(width, height);
+			creationTime = rset.getLong("creation_time");
 
-		if (location != null) {
-			location.readFrom(rset);
-		} else {
-			if (rset.getInt("coordinate_type") == 0) { //type cartesian
-				double x = (rset.getDouble("coordinate1"));
-				double y = (rset.getDouble("coordinate2"));
-				double z = (rset.getDouble("coordinate3"));
-				location = new Location(new CartesianCoordinate(x, y, z));
+			maxPhotoSize = PhotoSize.getFromWidthHeight(width, height);
+
+			if (location != null) {
+				location.readFrom(rset);
 			} else {
-				double phi = (rset.getDouble("coordinate1"));
-				double theta = (rset.getDouble("coordinate2"));
-				double radius = (rset.getDouble("coordinate3"));
-				location = new Location(new SphericCoordinate(phi, theta, radius));
+				if (rset.getInt("coordinate_type") == 0) { //type cartesian
+					double x = (rset.getDouble("coordinate1"));
+					double y = (rset.getDouble("coordinate2"));
+					double z = (rset.getDouble("coordinate3"));
+					location = new Location(new CartesianCoordinate(x, y, z));
+				} else {
+					double phi = (rset.getDouble("coordinate1"));
+					double theta = (rset.getDouble("coordinate2"));
+					double radius = (rset.getDouble("coordinate3"));
+					location = new Location(new SphericCoordinate(phi, theta, radius));
+				}
 			}
+		} catch (IllegalArgumentException e) {
+			final StringBuffer s = new StringBuffer("ResultSet is NullPointer. Values cannot be updated.");
+			SysLog.log(s);
 		}
 	}
 	
@@ -173,22 +196,28 @@ public class Photo extends DataObject {
 	 * 
 	 */
 	public void writeOn(ResultSet rset) throws SQLException {
-		rset.updateInt("id", id.asInt());
-		rset.updateInt("owner_id", ownerId);
-		rset.updateString("owner_name", ownerName);
-		rset.updateBoolean("owner_notify_about_praise", ownerNotifyAboutPraise);
-		rset.updateString("owner_email_address", ownerEmailAddress.asString());
-		rset.updateInt("owner_language", ownerLanguage.asInt());
-		rset.updateString("owner_home_page", ownerHomePage.toString());
-		rset.updateInt("width", width);
-		rset.updateInt("height", height);
-		rset.updateString("tags", tags.asString());
-		rset.updateInt("status", status.asInt());
-		rset.updateInt("praise_sum", praiseSum);
-		rset.updateInt("no_votes", noVotes);
-		rset.updateLong("creation_time", creationTime);
-		if (location != null) {
-			location.writeOn(rset);
+		try {
+			assertArgumentNotNull(rset);
+			rset.updateInt("id", id.asInt());
+			rset.updateInt("owner_id", ownerId);
+			rset.updateString("owner_name", ownerName);
+			rset.updateBoolean("owner_notify_about_praise", ownerNotifyAboutPraise);
+			rset.updateString("owner_email_address", ownerEmailAddress.asString());
+			rset.updateInt("owner_language", ownerLanguage.asInt());
+			rset.updateString("owner_home_page", ownerHomePage.toString());
+			rset.updateInt("width", width);
+			rset.updateInt("height", height);
+			rset.updateString("tags", tags.asString());
+			rset.updateInt("status", status.asInt());
+			rset.updateInt("praise_sum", praiseSum);
+			rset.updateInt("no_votes", noVotes);
+			rset.updateLong("creation_time", creationTime);
+			if (location != null) {
+				location.writeOn(rset);
+			}
+		} catch (IllegalArgumentException e) {
+			final StringBuffer s = new StringBuffer("ResultSet is NullPointer. Values cannot be updated.");
+			SysLog.log(s);
 		}
 	}
 

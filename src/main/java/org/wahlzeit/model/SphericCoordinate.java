@@ -1,5 +1,7 @@
 package org.wahlzeit.model;
 
+import org.wahlzeit.services.SysLog;
+
 import java.util.ArrayList;
 
 import static org.wahlzeit.model.AssertUtils.*;
@@ -9,33 +11,60 @@ public class SphericCoordinate extends AbstractCoordinate {
     private double theta;
     private double radius;
 
-    public SphericCoordinate(double phi, double theta, double radius) throws IllegalArgumentException{
-        assertValidDouble(phi);
-        assertValidDouble(theta);
-        assertValidDouble(radius);
-        assertNotNegative(radius);
+    public SphericCoordinate(double phi, double theta, double radius) {
+        double tmp_phi, tmp_theta, tmp_radius;
+        try {
+            assertValidDouble(phi);
+            assertValidDouble(theta);
+            assertValidDouble(radius);
+            assertNotNegative(radius);
+            tmp_phi = phi;
+            tmp_theta = theta;
+            tmp_radius = radius;
+        } catch (IllegalStateException e) {
+            //If one coordinate is not valid and set to 0.0, the other coordinates won't fit anymore and are also set to 0.0.
+            final StringBuffer s = new StringBuffer("One value is not a valid double or radius is negative. radius, phi and theta are set to 0.0.");
+            SysLog.log(s);
+            tmp_phi = 0.0;
+            tmp_theta = 0.0;
+            tmp_radius = 0.0;
+        }
         if (radius <= tolerance) {
             //if radius = 0.0, theta and phi are also 0.0
-            this.phi = 0.0;
-            this.theta = 0.0;
-            this.radius = 0.0;
+            setPhi(0.0);
+            setTheta(0.0);
+            setRadius(0.0);
         } else {
-            this.phi = phi;
-            this.theta = theta;
-            this.radius = radius;
+            setPhi(tmp_phi);
+            setTheta(tmp_theta);
+            setRadius(tmp_radius);
         }
         assertClassInvariants();
     }
 
-    public CartesianCoordinate asCartesianCoordinate() throws ArithmeticException {
-        assertClassInvariants();
-        double x = radius * Math.cos(phi) * Math.sin(theta);
-        double y = radius * Math.sin(phi) * Math.sin(theta);
-        double z = radius * Math.cos(theta);
-        CartesianCoordinate cartesian = new CartesianCoordinate(x, y, z);
-        //CartesianCoordinate Constructor executes assertClassInvariants for cartesian
-        assertClassInvariants();
-        return cartesian;
+    public CartesianCoordinate asCartesianCoordinate() throws WrongCalculationException {
+        try {
+            assertClassInvariants();
+            double backup_phi = phi;
+            double backup_theta = theta;
+            double backup_radius = radius;
+            double x = radius * Math.cos(phi) * Math.sin(theta);
+            double y = radius * Math.sin(phi) * Math.sin(theta);
+            double z = radius * Math.cos(theta);
+            CartesianCoordinate cartesian = new CartesianCoordinate(x, y, z);
+            //CartesianCoordinate Constructor executes assertClassInvariants for cartesian
+            try {
+                assertClassInvariants();
+            } catch (IllegalStateException e) {
+                //If the class invariants were corrupted during the calculation, reset to value before calculation.
+                phi = backup_phi;
+                theta = backup_theta;
+                radius = backup_radius;
+            }
+            return cartesian;
+        } catch (ArithmeticException e) {
+            throw new WrongCalculationException("Arithmetic error in calculation of asCartesianCoordinate.");
+        }
     }
 
     public SphericCoordinate asSphericCoordinate() {
@@ -43,25 +72,48 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     @Override
-    public double getCentralAngle(Coordinate coordinate) {
-        assertArgumentNotNull(coordinate);
-        assertClassInvariants();
-        SphericCoordinate s = coordinate.asSphericCoordinate();
-        double part1 = Math.sin(phi) * Math.sin(s.getPhi());
-        double deltaTheta = Math.abs(s.getTheta() - theta);
-        double part2 = Math.cos(phi) * Math.cos(s.getPhi()) * Math.cos(deltaTheta);
-        double centralAngle = Math.acos(part1 + part2);
-        assertValidDouble(centralAngle);
-        assertAngle(centralAngle);
-        assertClassInvariants();
-        return centralAngle;
+    public double getCentralAngle(Coordinate coordinate) throws WrongCalculationException {
+        try {
+            assertArgumentNotNull(coordinate);
+            assertClassInvariants();
+            double backup_phi = phi;
+            double backup_theta = theta;
+            double backup_radius = radius;
+            SphericCoordinate s = coordinate.asSphericCoordinate();
+            double part1 = Math.sin(phi) * Math.sin(s.getPhi());
+            double deltaTheta = Math.abs(s.getTheta() - theta);
+            double part2 = Math.cos(phi) * Math.cos(s.getPhi()) * Math.cos(deltaTheta);
+            double centralAngle = Math.acos(part1 + part2);
+            assertValidDouble(centralAngle);
+            assertAngle(centralAngle);
+            try {
+                assertClassInvariants();
+            } catch (IllegalStateException e) {
+                //If the class invariants were corrupted during the calculation, reset to value before calculation.
+                phi = backup_phi;
+                theta = backup_theta;
+                radius = backup_radius;
+            }
+            return centralAngle;
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new WrongCalculationException(e.getMessage());
+        } catch (ArithmeticException e) {
+            throw new WrongCalculationException("Arithmetic error in calculation of getCentralAngle.");
+        }
+
     }
 
     //get coordinate type and the values of the three coordinates to write them into the variables of the subclass
-    public void doReadFrom(int type, double c1, double c2, double c3) {
+    public void doReadFrom(int type, double c1, double c2, double c3) throws WrongCalculationException {
         if (type == 0) { //type cartesian
             //Coordinates of the ResultSet are of type cartesian and have to be converted before saving
-            SphericCoordinate s = new CartesianCoordinate(c1, c2, c3).asSphericCoordinate();
+            SphericCoordinate s;
+            try {
+                s = new CartesianCoordinate(c1, c2, c3).asSphericCoordinate();
+            } catch (WrongCalculationException e) {
+                throw new WrongCalculationException("Arithmetic error in calculation of asSphericCoordinate.");
+            }
+
             //SphericCoordinate Constructor in asSphericCoordinate executes assertClassInvariants for s
             setPhi(s.getPhi());
             setTheta(s.getTheta());
@@ -91,8 +143,13 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setPhi(double phi) {
-        assertValidDouble(phi);
-        this.phi = phi;
+        try {
+            assertValidDouble(phi);
+            this.phi = phi;
+        } catch (IllegalStateException e) {
+            final StringBuffer s = new StringBuffer("phi is not a valid double. " + e.getMessage() + " phi is not updated.");
+            SysLog.log(s);
+        }
     }
 
     public double getTheta() {
@@ -100,8 +157,13 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setTheta(double theta) {
-        assertValidDouble(theta);
-        this.theta = theta;
+        try {
+            assertValidDouble(theta);
+            this.theta = theta;
+        } catch (IllegalStateException e) {
+            final StringBuffer s = new StringBuffer("theta is not a valid double. " + e.getMessage() + " theta is not updated.");
+            SysLog.log(s);
+        }
     }
 
     public double getRadius() {
@@ -109,9 +171,14 @@ public class SphericCoordinate extends AbstractCoordinate {
     }
 
     public void setRadius(double radius) {
-        assertValidDouble(radius);
-        assertNotNegative(radius);
-        this.radius = radius;
+        try {
+            assertValidDouble(radius);
+            assertNotNegative(radius);
+            this.radius = radius;
+        } catch (IllegalStateException e) {
+            final StringBuffer s = new StringBuffer("radius: " + e.getMessage() + " radius is not updated.");
+            SysLog.log(s);
+        }
     }
 
     @Override

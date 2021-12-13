@@ -1,6 +1,8 @@
 package org.wahlzeit.model;
 
+import org.wahlzeit.services.SysLog;
 import java.util.Objects;
+import static org.wahlzeit.model.AssertUtils.*;
 
 public class Animal {
     private String name;
@@ -12,7 +14,16 @@ public class Animal {
     public Animal(String name, String animalClass, double avg_weight, boolean vegetarian, String habitat) {
         this.name = name;
         this.animalClass = animalClass;
-        this.avg_weight = avg_weight;
+        try {
+            assertValidDouble(avg_weight);
+            assertNotNegative(avg_weight);
+            this.avg_weight = avg_weight;
+        } catch (IllegalStateException e) {
+            final StringBuffer s = new StringBuffer("Average weight is not a valid double or negative. Passed average weight "
+                    + avg_weight + " is set to 0.");
+            SysLog.log(s);
+            this.avg_weight = 0.0;
+        }
         this.vegetarian = vegetarian;
         this.habitat = habitat;
     }
@@ -38,7 +49,14 @@ public class Animal {
     }
 
     public void setAvg_weight(double avg_weight) {
-        this.avg_weight = avg_weight;
+        try {
+            assertNotNegative(avg_weight);
+            this.avg_weight = avg_weight;
+        } catch (IllegalStateException e) {
+            final StringBuffer s = new StringBuffer("Average weight is not a valid double or negative. average weight is not updated.");
+            SysLog.log(s);
+        }
+
     }
 
     public boolean isVegetarian() {
@@ -58,11 +76,19 @@ public class Animal {
     }
 
     public boolean isEqual(Animal animal) {
-        return this.name.equals(animal.getName()) &&
-                this.animalClass.equals(animal.getAnimalClass()) &&
-                Math.abs(this.avg_weight - animal.getAvg_weight()) <= 0.1 &&
-                this.vegetarian == animal.isVegetarian() &&
-                this.habitat.equals(animal.getHabitat());
+        try {
+            assertArgumentNotNull(animal);
+            return this.name.equals(animal.getName()) &&
+                    this.animalClass.equals(animal.getAnimalClass()) &&
+                    Math.abs(this.avg_weight - animal.getAvg_weight()) <= 0.1 &&
+                    this.vegetarian == animal.isVegetarian() &&
+                    this.habitat.equals(animal.getHabitat());
+        } catch (IllegalArgumentException e) {
+            final StringBuffer s = new StringBuffer("Comparison with a NullPointer not possible. Animals are not equal.");
+            SysLog.log(s);
+            return false;
+        }
+
     }
 
     @Override
