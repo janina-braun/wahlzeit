@@ -1,5 +1,7 @@
 package org.wahlzeit.model;
 
+import org.wahlzeit.model.coordinate.CartesianCoordinate;
+import org.wahlzeit.model.coordinate.Coordinate;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.SysLog;
 
@@ -20,14 +22,15 @@ public class Location extends DataObject {
         } catch (IllegalArgumentException e) {
             final StringBuffer s = new StringBuffer("Coordinate is NullPointer. Fall back to default cartesian coordinate.");
             SysLog.log(s);
-            this.coordinate = new CartesianCoordinate(0, 0, 0);
+            this.coordinate = CartesianCoordinate.ensureCartesianCoordinate(0, 0, 0);
         }
     }
 
 
     @Override
     public void readFrom(ResultSet rset) throws SQLException {
-        coordinate.readFrom(rset);
+        //readFrom returns new Coordinate object instead of changing the state of the object
+        coordinate = coordinate.readFrom(rset);
     }
 
     @Override

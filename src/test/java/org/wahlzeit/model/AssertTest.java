@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static org.wahlzeit.model.AbstractCoordinate.*;
+import static org.wahlzeit.model.coordinate.AbstractCoordinate.*;
 import static org.wahlzeit.model.AssertUtils.*;
-import static org.wahlzeit.model.SphericCoordinate.*;
+import static org.wahlzeit.model.coordinate.SphericCoordinate.*;
 
 public class AssertTest {
     @Test(expected = IllegalStateException.class)

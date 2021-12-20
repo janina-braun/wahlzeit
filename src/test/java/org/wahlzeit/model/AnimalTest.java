@@ -1,6 +1,8 @@
 package org.wahlzeit.model;
 
 import org.junit.Test;
+import org.wahlzeit.model.coordinate.CartesianCoordinate;
+import org.wahlzeit.model.coordinate.Coordinate;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotEquals;
@@ -20,7 +22,7 @@ public class AnimalTest {
 
     @Test
     public void testEquals() {
-        Coordinate cCoordinate = new CartesianCoordinate(1,2,3);
+        Coordinate cCoordinate = CartesianCoordinate.ensureCartesianCoordinate(1,2,3);
         Animal animal1 = new Animal("elephant", "mammal", 4000.0, true, "forest");
         Animal animal2 = new Animal("crocodile", "reptile", 200.0, true, "water");
         Animal animal3 = new Animal("crocodile", "reptile", 200.0, true, "water");

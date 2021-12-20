@@ -8,6 +8,8 @@ package org.wahlzeit.model;
 import java.sql.*;
 import java.net.*;
 
+import org.wahlzeit.model.coordinate.CartesianCoordinate;
+import org.wahlzeit.model.coordinate.SphericCoordinate;
 import org.wahlzeit.services.*;
 import org.wahlzeit.utils.*;
 
@@ -178,12 +180,12 @@ public class Photo extends DataObject {
 					double x = (rset.getDouble("coordinate1"));
 					double y = (rset.getDouble("coordinate2"));
 					double z = (rset.getDouble("coordinate3"));
-					location = new Location(new CartesianCoordinate(x, y, z));
+					location = new Location(CartesianCoordinate.ensureCartesianCoordinate(x, y, z));
 				} else {
 					double phi = (rset.getDouble("coordinate1"));
 					double theta = (rset.getDouble("coordinate2"));
 					double radius = (rset.getDouble("coordinate3"));
-					location = new Location(new SphericCoordinate(phi, theta, radius));
+					location = new Location(SphericCoordinate.ensureSphericCoordinate(phi, theta, radius));
 				}
 			}
 		} catch (IllegalArgumentException e) {

@@ -1,6 +1,8 @@
 package org.wahlzeit.model;
 import org.junit.Before;
 import org.junit.Test;
+import org.wahlzeit.model.coordinate.CartesianCoordinate;
+import org.wahlzeit.model.coordinate.SphericCoordinate;
 
 import java.util.ArrayList;
 
@@ -20,14 +22,14 @@ public class CartesianCoordinateTest {
 
     @Before
     public void setUp() {
-        coordinate0 = new CartesianCoordinate(0,0,0);
-        coordinate1 = new CartesianCoordinate(1,2,3);
-        coordinate2 = new CartesianCoordinate(3,2,1);
-        coordinate3 = new CartesianCoordinate(3,2,1);
-        s_coordinate0 = new SphericCoordinate(0,0,0);
-        s_coordinate1 = new SphericCoordinate(1.10714871779409, 0.640522312679425,  3.74165738677394); //equals coordinate1
-        s_coordinate2 = new SphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate2
-        s_coordinate3 = new SphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate3
+        coordinate0 = CartesianCoordinate.ensureCartesianCoordinate(0,0,0);
+        coordinate1 = CartesianCoordinate.ensureCartesianCoordinate(1,2,3);
+        coordinate2 = CartesianCoordinate.ensureCartesianCoordinate(3,2,1);
+        coordinate3 = CartesianCoordinate.ensureCartesianCoordinate(3,2,1);
+        s_coordinate0 = SphericCoordinate.ensureSphericCoordinate(0,0,0);
+        s_coordinate1 = SphericCoordinate.ensureSphericCoordinate(1.10714871779409, 0.640522312679425,  3.74165738677394); //equals coordinate1
+        s_coordinate2 = SphericCoordinate.ensureSphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate2
+        s_coordinate3 = SphericCoordinate.ensureSphericCoordinate(0.588002603547568, 1.30024656381632, 3.74165738677394); //equals coordinate3
         location = new Location(coordinate1);
     }
 
@@ -51,13 +53,13 @@ public class CartesianCoordinateTest {
     }
 
     @Test
-    public void testAsSphericCoordinate() throws WrongCalculationException {
+    public void testAsSphericCoordinate() {
         SphericCoordinate s = coordinate2.asSphericCoordinate();
         assertEquals(s_coordinate2, s); //cartesian to spheric
     }
 
     @Test
-    public void testOriginAsSphericCoordinate() throws WrongCalculationException {
+    public void testOriginAsSphericCoordinate() {
         SphericCoordinate s = coordinate0.asSphericCoordinate();
         assertEquals(s_coordinate0, s); //cartesian to spheric
     }
