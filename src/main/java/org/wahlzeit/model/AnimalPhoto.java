@@ -1,12 +1,17 @@
 package org.wahlzeit.model;
 
 import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.PatternInstance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.wahlzeit.model.AssertUtils.assertArgumentNotNull;
 
+@PatternInstance(
+        patternName = "Abstract Factory",
+        participants = {"ConcreteProduct"}
+)
 public class AnimalPhoto extends Photo{
     private Animal animal = null;
 

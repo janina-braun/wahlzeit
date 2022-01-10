@@ -8,12 +8,16 @@ package org.wahlzeit.model;
 import java.util.*;
 
 import org.wahlzeit.services.*;
+import org.wahlzeit.utils.PatternInstance;
 
 /**
  * LanguageConfigs provides a simple access points to different language-based configurations. For every available
  * language, there is a model configuration, which captures local specific stuff.
  */
-
+@PatternInstance(
+		patternName = "Context",
+		participants = {"ConcreteStrategy"}
+)
 public class LanguageConfigs {
 
 	/**

@@ -1,10 +1,15 @@
 package org.wahlzeit.model;
 
 import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.PatternInstance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@PatternInstance(
+        patternName = "Abstract Factory",
+        participants = {"ConcreteFactory"}
+)
 public class AnimalPhotoFactory extends PhotoFactory{
 
     private static boolean isInitialized = false;

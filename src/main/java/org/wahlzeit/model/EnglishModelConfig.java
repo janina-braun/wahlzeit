@@ -14,6 +14,10 @@ import org.wahlzeit.utils.*;
 /**
  * A model configuration for the English language.
  */
+@PatternInstance(
+		patternName = "Strategy",
+		participants = {"ConcreteStrategy"}
+)
 public class EnglishModelConfig extends AbstractModelConfig {
 
 	/**

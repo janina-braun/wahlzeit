@@ -2,6 +2,7 @@ package org.wahlzeit.model.coordinate;
 
 import org.wahlzeit.model.WrongCalculationException;
 import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.PatternInstance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +11,10 @@ import java.util.HashMap;
 
 import static org.wahlzeit.model.AssertUtils.*;
 
+@PatternInstance(
+        patternName = "Template Method",
+        participants = {"AbstractClass"}
+)
 public abstract class AbstractCoordinate implements Coordinate {
     final double tolerance = 0.0001;
 

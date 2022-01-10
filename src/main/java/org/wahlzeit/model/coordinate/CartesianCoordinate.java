@@ -2,12 +2,17 @@ package org.wahlzeit.model.coordinate;
 
 import org.wahlzeit.model.WrongCalculationException;
 import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.PatternInstance;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.wahlzeit.model.AssertUtils.*;
 
+@PatternInstance(
+        patternName = "Template Method",
+        participants = {"ConcreteClass"}
+)
 public class CartesianCoordinate extends AbstractCoordinate {
     private final double x;
     private final double y;

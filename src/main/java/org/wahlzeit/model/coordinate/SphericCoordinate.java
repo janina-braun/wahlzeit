@@ -2,11 +2,16 @@ package org.wahlzeit.model.coordinate;
 
 import org.wahlzeit.model.WrongCalculationException;
 import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.PatternInstance;
 
 import java.util.ArrayList;
 
 import static org.wahlzeit.model.AssertUtils.*;
 
+@PatternInstance(
+        patternName = "Template Method",
+        participants = {"ConcreteClass"}
+)
 public class SphericCoordinate extends AbstractCoordinate {
     private final double phi;
     private final double theta;
