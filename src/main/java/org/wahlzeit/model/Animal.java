@@ -5,66 +5,52 @@ import java.util.Objects;
 import static org.wahlzeit.model.AssertUtils.*;
 
 public class Animal {
-    private String name;
-    private String animalClass;
-    private double avg_weight;
-    private boolean vegetarian;
+    private AnimalType animalType;
+    private double weight;
     private String habitat;
 
-    public Animal(String name, String animalClass, double avg_weight, boolean vegetarian, String habitat) {
-        this.name = name;
-        this.animalClass = animalClass;
+    public Animal(AnimalType animalType) {
+        this.animalType = animalType;
+        this.weight = 0.0;
+        this.habitat = "";
+    }
+
+    public Animal(AnimalType animalType, double weight, String habitat) {
+        this.animalType = animalType;
         try {
-            assertValidDouble(avg_weight);
-            assertNotNegative(avg_weight);
-            this.avg_weight = avg_weight;
+            assertValidDouble(weight);
+            assertNotNegative(weight);
+            this.weight = weight;
         } catch (IllegalStateException e) {
-            final StringBuffer s = new StringBuffer("Average weight is not a valid double or negative. Passed average weight "
-                    + avg_weight + " is set to 0.");
+            final StringBuffer s = new StringBuffer("Weight is not a valid double or negative. Passed weight "
+                    + weight + " is set to 0.");
             SysLog.log(s);
-            this.avg_weight = 0.0;
+            this.weight = 0.0;
         }
-        this.vegetarian = vegetarian;
         this.habitat = habitat;
     }
 
-    public String getName() {
-        return name;
+    public AnimalType getAnimalType() {
+        return animalType;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAnimalType(AnimalType animalType) {
+        this.animalType = animalType;
     }
 
-    public String getAnimalClass() {
-        return animalClass;
+    public double getWeight() {
+        return weight;
     }
 
-    public void setAnimalClass(String animalClass) {
-        this.animalClass = animalClass;
-    }
-
-    public double getAvg_weight() {
-        return avg_weight;
-    }
-
-    public void setAvg_weight(double avg_weight) {
+    public void setWeight(double weight) {
         try {
-            assertNotNegative(avg_weight);
-            this.avg_weight = avg_weight;
+            assertNotNegative(weight);
+            this.weight = weight;
         } catch (IllegalStateException e) {
             final StringBuffer s = new StringBuffer("Average weight is not a valid double or negative. average weight is not updated.");
             SysLog.log(s);
         }
 
-    }
-
-    public boolean isVegetarian() {
-        return vegetarian;
-    }
-
-    public void setVegetarian(boolean vegetarian) {
-        this.vegetarian = vegetarian;
     }
 
     public String getHabitat() {
@@ -78,10 +64,8 @@ public class Animal {
     public boolean isEqual(Animal animal) {
         try {
             assertArgumentNotNull(animal);
-            return this.name.equals(animal.getName()) &&
-                    this.animalClass.equals(animal.getAnimalClass()) &&
-                    Math.abs(this.avg_weight - animal.getAvg_weight()) <= 0.1 &&
-                    this.vegetarian == animal.isVegetarian() &&
+            return this.animalType.equals(animal.getAnimalType()) &&
+                    Math.abs(this.weight - animal.getWeight()) <= 0.1 &&
                     this.habitat.equals(animal.getHabitat());
         } catch (IllegalArgumentException e) {
             final StringBuffer s = new StringBuffer("Comparison with a NullPointer not possible. Animals are not equal.");
@@ -100,6 +84,6 @@ public class Animal {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, animalClass, avg_weight, vegetarian, habitat);
+        return Objects.hash(animalType, weight, habitat);
     }
 }

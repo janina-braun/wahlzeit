@@ -36,7 +36,7 @@ CREATE TABLE photos (
 	coordinate3 double precision,
 	animal_name text,
 	animal_class text,
-	avg_weight double precision,
+	weight double precision,
 	vegetarian boolean,
 	habitat text
 );

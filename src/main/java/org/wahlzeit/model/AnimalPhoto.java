@@ -14,6 +14,7 @@ import static org.wahlzeit.model.AssertUtils.assertArgumentNotNull;
 )
 public class AnimalPhoto extends Photo{
     private Animal animal = null;
+    private static AnimalManager animalManager = AnimalManager.getInstance();
 
     public AnimalPhoto() {
         super();
@@ -50,18 +51,17 @@ public class AnimalPhoto extends Photo{
         try {
             assertArgumentNotNull(rset);
             super.readFrom(rset);
-            if (animal != null) {
-                animal.setName(rset.getString("animal_name"));
-                animal.setAnimalClass(rset.getString("animal_class"));
-                animal.setAvg_weight(rset.getDouble("avg_weight"));
-                animal.setVegetarian(rset.getBoolean("vegetarian"));
-                animal.setHabitat(rset.getString("habitat"));
+            String name = rset.getString("animal_name");
+            String animalClass = rset.getString("animal_class");
+            double weight = rset.getDouble("weight");
+            Boolean vegetarian = rset.getBoolean("vegetarian");
+            String habitat = rset.getString("habitat");
+            AnimalType animalType = animalManager.ensureAnimalType(name, animalClass, vegetarian);
+            if (animal != null && animal.getAnimalType().equals(animalType) ) {
+                animal.setWeight(weight);
+                animal.setHabitat(habitat);
             } else {
-                this.animal = new Animal(rset.getString("animal_name"),
-                        rset.getString("animal_class"),
-                        rset.getDouble("avg_weight"),
-                        rset.getBoolean("vegetarian"),
-                        rset.getString("habitat"));
+                animal = animalManager.createAnimal(animalType, weight, habitat);
             }
         } catch (IllegalArgumentException e) {
             final StringBuffer s = new StringBuffer("ResultSet is NullPointer. Values cannot be updated.");
@@ -76,10 +76,10 @@ public class AnimalPhoto extends Photo{
             assertArgumentNotNull(rset);
             super.writeOn(rset);
             if (animal != null) {
-                rset.updateString("animal_name", animal.getName());
-                rset.updateString("animal_class", animal.getAnimalClass());
-                rset.updateDouble("avg_weight", animal.getAvg_weight());
-                rset.updateBoolean("vegetarian", animal.isVegetarian());
+                rset.updateString("animal_name", animal.getAnimalType().getName());
+                rset.updateString("animal_class", animal.getAnimalType().getAnimalClass());
+                rset.updateDouble("avg_weight", animal.getWeight());
+                rset.updateBoolean("vegetarian", animal.getAnimalType().isVegetarian());
                 rset.updateString("habitat", animal.getHabitat());
             }
         } catch (IllegalArgumentException e) {
