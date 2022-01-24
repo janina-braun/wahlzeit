@@ -4,6 +4,21 @@ import org.wahlzeit.services.SysLog;
 import java.util.Objects;
 import static org.wahlzeit.model.AssertUtils.*;
 
+/**
+ * Method Calls:
+ * - AnimalManager calls createAnimal() with an AnimalType (and additional parameters)
+ * - thereby createInstance() of AnimalType is called with the corresponding AnimalType
+ * - in AnimalType calling createInstance() creates a new Animal by calling a constructor of Animal
+ *
+ * Object Creation Table:
+ * - Delegation: separate-object (AnimalType)
+ * - Selection: on-the-spot (hard coded constructor)
+ * - Configuration: in-code (no Annotations/Configuration file)
+ * - Instantiation: in-code (Constructor call from AnimalType)
+ * - Initialization: by-fixed-signature (Animal Constructor with fixed parameter)
+ * - Building: default (Animal creates dependent object)
+ */
+
 public class Animal {
     private AnimalType animalType;
     private double weight;

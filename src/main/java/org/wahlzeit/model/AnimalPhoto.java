@@ -8,6 +8,21 @@ import java.sql.SQLException;
 
 import static org.wahlzeit.model.AssertUtils.assertArgumentNotNull;
 
+/**
+ * Method Calls:
+ * - AnimalPhotoManager calls createObject() with a ResultSet
+ * - thereby createPhoto() of AnimalPhotoFactory is called with the ResultSet
+ * - in AnimalPhotoFactory calling createPhoto() creates a new photo by calling a constructor of AnimalPhoto with the ResultSet
+ *
+ * Object Creation Table:
+ * - Delegation: separate-object (AnimalPhotoFactory)
+ * - Selection: by-subclassing (AnimalPhoto extends Photo)
+ * - Configuration: in-code (no Annotations/Configuration file)
+ * - Instantiation: in-code (Constructor call from AnimalPhotoFactory)
+ * - Initialization: by-fixed-signature (AnimalPhoto Constructor with fixed parameter)
+ * - Building: default (AnimalPhoto creates dependent object)
+ */
+
 @PatternInstance(
         patternName = "Abstract Factory",
         participants = {"ConcreteProduct"}
